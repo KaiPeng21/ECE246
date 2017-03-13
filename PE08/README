@@ -1,0 +1,190 @@
+// ~ Overview ~ //
+
+This exercise will familiarize you with 2-dimensional arrays and
+some more file operations.
+
+// ~ Learning Goals ~ //
+
+(1) To learn to perform file operations
+(2) To learn to manipulate 2-dimensional arrays 
+
+// ~ Submitting Your Assignment ~ //
+
+You must submit three files:
+
+(1) answer08.c
+(2) answer08.h
+(3) pe08.c
+
+You submit the files using the following command.
+ 
+> 264submit PE08 answer08.c answer08.h pe08.c
+
+// ~ Overview ~ //
+
+This exercise will give you more practice with file operations
+and memory allocation.
+
+// ~ file format (input and output) ~ //
+
+In this exercise, you will use fread and fwrite extensively
+to operate on files.  A matrix is stored in a file as follows:
+
+The first sizeof(int) bytes is an int, which specifies the size of the
+matrix.  Subsequently, you have size*size*sizeof(double) bytes,
+where size is the size of the matrix.
+
+The first size*sizeof(double) bytes are the first row of entries,
+each a double, of the matrix.  The entries are from ordered from the
+first column till the last column.  The next size*sizeof(double) are
+the second row of entries, and so on.  
+
+No newlines or white space should be in the file.  Some sample matrices 
+are given to you.  
+mat.100 is a 100-by-100 matrix, for example.
+
+// ~ Functions to be written in answer08.c ~ // 
+
+In answer08.h, five functions are declared:
+
+double **Read_matrix_from_file(char *filename, int *size);  
+int Write_matrix_to_file(char *filename, double **matrix, int size); 
+double **Matrix_matrix_multiply(double **matrixa, double **matrixb, int size); 
+double Matrix_matrix_difference(double **matrixa, double **matrixb, int size); 
+void Deallocate_matrix_space(double **matrix, int size); 
+
+(2 points) 
+
+double **Read_matrix_from_file(char *filename, int *size);  
+
+This function reads a matrix from a given filename.  If the 
+matrix can be formed correctly, the matrix should be returned, and the number 
+of rows (or columns) of the matrix stored in (*size).
+
+(2 points) 
+int Write_matrix_to_file(char *filename, double **matrix, int size); 
+
+This function writes a matrix of a given size (number of rows 
+or column) to a given filename.  If the matrix can be stored properly, 1 
+should be returned.  Otherwise, 0 should be returned.
+
+(2 points)
+
+double **Matrix_matrix_multiply(double **matrixa, double **matrixb, int size); 
+
+This function performs the multiplication of two matrices of the same 
+dimensions.  The result of matrixa * matrixb should be returned.
+
+(2 points)
+
+double Matrix_matrix_difference(double **matrixa, double **matrixb, int size); 
+
+This function calculates the absolute difference of two given matrices.
+For each entry, you calculate the absolute difference between the 
+two corresponding entries in the two matrices.  Sum up all these absolute 
+differences and return the value.  
+
+(2 points)
+
+void Deallocate_matrix_space(double **matrix, int size); 
+
+This function frees all the space allocated to store the given matrix. 
+
+// ~ answer08.h ~ //
+
+You may have to define other functions in answer08.c.  If you plan to
+use these functions in pe08.c, you would have to declare these functions
+in answer08.h.  Whether you make changes to answer08.h or not, you
+have to include answer08.h in your submission.  For the functions that you 
+declare and define, do not start the function names with a prefix
+of two underscores "__".
+
+// ~ Function(s) to be written in pe08.c ~ // 
+
+(2 points) Your main function should expect an argument specifying one of 
+two options argv[1]:
+
+"-m": to perform multiplication
+      argv[2] should be an input file containing matrixa, 
+      argv[3] should be an input file containing matrixb,
+      argv[4] should be the output file to store the result of multiplication.
+      If for whatever reasons the multiplication cannot be carried out, the
+      output file should not be created, and you should return EXIT_FAILURE.
+
+"-d": to compute the difference between two matrices matrixa and matrixb
+      argv[2] should be an input file containing matrixa, 
+      argv[3] should be an input file containing matrixb,
+      the sum of absolute differences of the entries should be printed to the 
+      stdout using the following statement 
+
+      printf("%e\n", Matrix_matrix_difference(matrixa, matrixb, size)); 
+
+      This is the only stdout output in this exercise, and you have to
+      use the format "%e\n".
+
+      If for whatever reasons the computation cannot be performed, 
+      the output should not be printed and you should return EXIT_FAILURE.
+
+others: print an error message to stderr and return EXIT_FAILURE.
+
+Whenever you encounter errors and you want to print an error message,
+use stderr for printing, not stdout.  In such a case, always return 
+EXIT_FAILURE.
+
+Return EXIT_SUCCESS only if it is a succesful
+multiplication or a successful computation of deviation.
+
+There may be many other functions that would be useful to your program.
+you may declare and define them in pe08.c.   For the functions that you declare
+and define, do not start the function names with two underscores "__".
+
+// ~ How do you test your functions ~ //
+
+You should form a matrix whose entries are all known.  Perform
+a write, and then read, and check whether the matrix you just read
+in is the same as the known matrix (see asc_file.c and bin_file.c in
+Lecture06).  
+
+Similarly, you should use known matrices to perform a test of the
+multiplication function and a test of the deviation function.
+
+// ~ Example files ~ //
+
+The suffix of a filename is the size of the matrix.  However, you should 
+rely on the first 4 bytes (an int) of the file to get the matrix size, not 
+the file name.
+
+I have include some files in the folder "examples" and "identities".
+In the folder "examples", some randomly generated matrices are included.
+In the folder "identities", some identity matrices are included.
+
+I have included the results of multiplication of matrices in "examples"
+in the folder "multiply".  The filename is obtained by concatenating
+the filenames of the two matrices multiplied together:  the multiplication
+of mat.100 and imat100 (mat.100 * imat.100) gives you matimat.100, whereas the 
+mulitpication of imat100 and mat.100 (imat.100 * mat.100) gives you 
+imatmat.100, for example.
+
+// ~ WARNINGS ~ //
+
+We will have our own pe08.c to test your functions.
+We rely on only the functions originally declared in 
+answer08.h to write our pe08.c.  
+
+The following gcc command will be used for compilation:
+
+gcc -Wall -Werror -Wshadow -g pe08.c answer08.c -o pe08
+
+If you code does not compile, you will get zero for this exercise.
+
+We will check for memory leakage.  Memory leakage will result in 
+a heavy penalty.
+
+You should not expect your results to match exactly the results 
+given in the folder "multiply" because floating point operations 
+can result in precision loss easily.  We would be able to tolerate
+some differences (now you should understand why we want you to 
+implement the difference function).
+
+Any function that you declare and/or define should not have a 
+name that starts with two underscores "__".
