@@ -1,0 +1,220 @@
+// ~ Overview ~ //
+
+This exercise will familiarize you with 2-dimensional arrays and
+some more file operations.
+
+// ~ Learning Goals ~ //
+
+(1) To learn to perform file operations
+(2) To learn to create and manipulate 2-dimensional arrays using 
+malloc and free function.
+(3) To apply recursion to solve a maze traversal problem
+
+
+// ~ Submitting Your Assignment ~ //
+
+You must submit one zip file to blackboard. This zip file must
+contain:
+
+(1) pa_answer02.c
+(2) pa02.c
+
+You create the zip file using the following command.
+ 
+> zip pa02.zip pa_answer02.c pa02.c
+
+// ~ Overview ~ //
+
+This exercise will give you more practice with file operations,
+memory allocation, and recursion.
+
+You own a business that performs mowing using unmanned lawn mowers
+(ULM).  Suppose you have just agreed to a contract to provide mowing
+service to a corn maze operator.  Based on a pre-processed satellite 
+images of corn maze, where the walls of the corn maze are stored as 'X' and
+the paths are stored as ' ', you want to store the directions 
+in a ULM to be taken by it to mow every path in the maze.  
+
+In order to fulfil your contract, you have to make sure that you cover
+every path that is reachable from an entrance (the top-most, left-most
+opening).  Of course, you want to do that without actually running
+the ULM through the maze.  Instead, you want to simulate the steps 
+to be taken by the ULM, and decide whether you have covered "all" paths.
+
+In this exercise, you will write the following functions:
+
+(1) Given a file containing the satellite "image" of a rectangular
+corn maze, compute and store the directions to be taken by a ULM to mow 
+every path in the maze in a different file (10 points).
+(2) Given a file containing the satellite "image" of a rectangular
+corn maze, the directions of a ULM is another file, simulate the mowing,
+count the number of locations with grass but not mowed, and print an
+"image" representing the "mowed" corn maze (8 points).
+(3) The main function, which, depending on a user-given option, 
+call the function in (1) or (2) accordingly. (2 points).
+
+More details of the functions are provided below.
+
+// ~ Input file format ~ //
+
+Just like in PE05 and PE06, we are concerned with only rectangular
+mazes.  The mazes that we would consider are the mazes that are
+produced by the program amaze.c or expanded by your program in PE06.
+
+You may assume that only valid mazes will be used in this assignment
+(as in PE06 and PE07).
+
+// ~ Output file format ~ //
+
+There are two files that you will output:  a file containing the 
+directions for the first function, and a file containing the mowed
+corn maze for the second function.
+
+For the direction file, it contains a stream of characters
+'N', 'S', 'E', 'W' (all upper case), which stand for the
+north (up), south (down), east (right), west (left) directions, 
+respectively.  A 'N' ('S') character, for example, means that the ULM should 
+move north (south) by 1 row.  A 'E' ('W') character means that the ULM
+should move east (west) by 1 column.  No other characters, including space, 
+and newline are allowed in the file.  In other words, if I use the vi editor
+to open a direction file, the editor should say that it is an incomplete file.
+For the example sample.2.9x7, a direction file to mow the maze is
+sample.2.9x7.dir.
+
+For the mowed corn maze, the format is somewhat similar to an input file
+for a corn maze.  The difference is that that paths that have been mowed
+(in the simulation) should have the space character ' ' replaced by '.' 
+(full-stop character).  For the example sample.2.9x7 and the direction
+file sample.2.9x7.dir, the mowed maze is printed in the file 
+sample.2.9x7.mowed.
+
+// ~ Functions to be written ~ // 
+
+In pa_answer02.h, two functions are declared:
+
+void Get_mowing_directions(char *mazefile, char *directionfile);
+int Simulate_mowing(char *mazefile, char *directionfile, char *mowedfile);
+
+You have to define these two functions in pa_answer02.c.
+
+There are many other functions that would be useful to your program.
+For example, the Allocate_maze_space and Deallocate_maze_space functions
+in PE06 are probably needed in this assignment.  You should go through 
+PE05 and PE06 to select the important functions that you want to include in 
+this assignment.  Moreover, you will probably need other functions, but I will
+not specify them here.  All these functions should be declared and defined 
+in pa_answer02.c.  (Note that you cannot declared these additional functions
+in pa_answer02.h for ease of grading.)
+
+pa02.c should contain only the main function and nothing else.  The only two 
+user-defined functions that pa02.c would call in the main function are 
+the two functions declared in pa_answer02.h: Get_mowing_directions and
+Simulate_mowing.
+
+// ~ Get_mowing_directions ~ //
+
+You are given two filenames: the first one contains the given maze, and 
+second one is to be written with the directions to mow the given maze.
+
+If the maze file does not exist, you should immediately exit the function
+and return -1.
+
+If the maze file exists, you are to assume that the maze is either generated 
+from amaze.c, the program from Henry Kroll that is given to you in PE05 or 
+expanded from such a maze in PE06.  
+
+The ULM is positioned at the top-most, left-most entry of the maze.  The 
+function should determine the directions that would allow the ULM to cover 
+all locations with grass in the maze.  We assume that when an ULM is at 
+row r, column c, the location at (r, c) will be mowed.  It is fine for an 
+ULM to visit a location multiple times.  All locations with grass that can be 
+reached from the top-most, left-most entry of the maze should be mowed.  
+However, the ULM should never mow a location with corns or go out of bound.
+Moreover, the ULM must return to the top-most, left-most entry of the maze 
+at the end of mowing.  The directions generated by your function do not 
+have to match the example provided.
+
+// ~ Simulate_mowing ~ //
+
+Three filenames are given to the function:  The first one is the given maze,
+the second one is a direction file.  The third one should be used to contain
+the mowed corn maze.  
+
+If the maze file does not exist, you should immediately exit the function
+and return -1.
+
+If the maze file exists, you are to assume that the maze is either generated 
+from amaze.c, the program from Henry Kroll that is given to you in PE05 or 
+expanded from such a maze in PE06.  
+
+If the direction file does not exist, you should immediately exit the
+the function and return -1.
+
+The following applies when the maze file and direction file exist.  
+Again, at the beginning, the ULM is positioned at the top-most, left-most
+entry of the given maze.  Note that as we always start at the top-most, 
+left-most entry of the given maze, that location will always be visited and 
+be mowed regardless of the contents of the direction file.
+
+Depending on the direction character read from the direction file, the ULM 
+moves North or South by a row, or East or West by a column.   The simulation 
+terminates when
+
+(i) you reach the end of the direction file:  If the ULM is at the starting
+position again, you output the mowed corn maze into the third file, with 
+each grass location visited by the ULM now represented by '.'.  You return 
+the number of grass locations that have not been mowed.
+
+(ii) you reach the end of the direction file:  If the ULM is not at
+the starting position, you still output the mowed corn maze into the third 
+file, with each grass location visited by the ULM now represented by '.'.  
+However, you return -1.
+
+(iii) you encounter an illegal direction: (a) the character is not one of the
+'N', 'S', 'E', 'W';  (b) the direction will take the ULM out of bound; or
+(c) the direction will take the ULM to a location with corns.  You output the 
+corn maze that was mowed by all legal directions so far, and return -1.  
+
+// ~ main function ~//
+
+The main function expects "-s" or "-m" to supplied as argv[1].
+If not, the executable should exit with EXIT_FAILURE.
+
+If the "-s" is the first argument to the executable, it means that
+you should perform simulation to verify that the maze is mowed properly.
+We expect three arguments to follow the "-s" option.  
+The following arguments should be the maze file, the direction file, and
+the output file for the mowed maze.  You call the simulation function
+only if you have sufficient arguments.  Otherwise, you should exit
+with EXIT_FAILURE.
+
+Immediately after the simulation, you should print to stdout
+the returned value of the simulation function with the following
+printf format: "%d\n".
+
+If the "-m" is the first argument to the executable, it means that 
+you should determine the mowing directions.  The following arguments should
+be the maze file, and the output file for the mowing directions.
+You call the function to determine the mowing directions 
+only if you have sufficient arguments.  Otherwise, you should exit
+with EXIT_FAILURE.
+
+Note that you should write the simulation function before the
+mowing function.  In a sense, the simulation function helps to
+test whether your mowing function is correct.  The main function is
+designed to help you to write a useful function (like the mowing function)
+and a testing function (like the simulation function).
+
+// ~ WARNINGS ~ //
+
+The following gcc command will be used for
+compilation:
+
+gcc -Wall -Werror -Wshadow -g pa02.c pa_answer02.c -o pa02
+
+(You should write a Makefile.)
+
+If you code does not compile, you will get zero for this exercise.
+
+We will check for memory leakage.  Memory leakage will result in 
+a heavy penalty.
