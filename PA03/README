@@ -1,0 +1,379 @@
+// ~ Overview ~ //
+
+This assignment will familiarize you with 2-dimensional arrays and
+some more file operations.
+
+// ~ Learning Goals ~ //
+
+(1) To learn to perform file operations
+(2) To learn to manipulate 2-dimensional arrays 
+
+// ~ Submitting Your Assignment ~ //
+
+You must submit three files:
+
+(1) pa_answer03.c
+(2) pa03.c
+(3) pa_answer03.h
+
+You submit the files using the following command:
+ 
+> 264submit PA03 pa_answer03.c pa03.c pa_answer03.h
+
+// ~ Overview ~ //
+
+This assignment will give you more practice with file operations
+and memory allocation.  You should re-use as much as possible 
+functional code from PE08.  With some minor modifications, you can 
+easily get 50% of the grade of this assignment.
+
+You will implement the Gauss-Jordan method for inverting a square 
+matrix with n rows and n columns.
+
+The information below is taken from 
+
+http://www.mathsisfun.com/algebra/matrix-inverse-row-operations-gauss-jordan.html
+
+Given a square matrix A, the Gauss-Jordan method first form an augmented 
+matrix 
+
+			[ A | I ]
+
+where I is the identity matrix (diagonal entries are 1's and 0's everywhere 
+else).
+
+By applying elementary row operations to the augmented matrix, i.e.
+(i) swapping rows,
+(ii) multiply or divide each element in a row by a non-zero constant,
+(iii) replace a row by adding or subtracting a multiple of another row to it,
+
+we eventually can obtain 
+
+			[ I | A^(-1) ]
+
+where A^(-1) is the inverse of A.
+
+Here is an example given in the aforementioned website:
+
+Given a 3x3 A = 	[ 3 0  2 ]
+			[ 2 0 -2 ]
+			[ 0 1  1 ]
+
+The augmented matrix is (we will remove the square brackets for ease of
+presentation)
+
+3 0  2 | 1 0 0
+2 0 -2 | 0 1 0		divide row 1 by 3
+0 1  1 | 0 0 1
+	
+1 0 2/3 | 1/3 0 0
+2 0  -2 | 0   1 0	row 2 - 2*row 1
+0 1   1 | 0   0 1
+
+1 0   2/3 |  1/3 0 0
+0 0 -10/3 | -2/3 1 0	swap row 3 with row 2 
+0 1     1 |    0 0 1
+
+1 0   2/3 |  1/3 0 0
+0 1     1 |    0 0 1	divide row 3 by -10/3
+0 0 -10/3 | -2/3 1 0   
+
+1 0 2/3 | 1/3     0 0
+0 1   1 |   0     0 1   
+0 0   1 | 1/5 -3/10 0   
+
+These operations turn all diagonal entries to 1 and all lower-triangular 
+entries (entries below the diagonal entries) to 0.  In particular, 
+the swapping of row 3 with row 2 ensures that you don't have a 
+diagonal entry that is 0.  In these operations, we proceed row-by-row
+from top to bottom.  For the i-th row, we make the diagonal entry 1 
+(row i, column i).  This is possible only if the original entry at that
+location is non-zero.  Otherwise, you have to find a row below
+row i with a non-zero entry at column i and swap the two rows.  (If you
+CANNOT find such a row, the matrix is not invertible.)  After you
+have turned the diagonal entry 1, you use that entry to turn all entries
+at column i below row i to 0 by using the third elementary row operation. 
+
+Now, you want to turn all upper-triangular entries (those entries above
+the diagonal entries) 0.  Now, you rely on the third elementary row
+operation, and proceed from the bottom-most row to the top-most row.
+For each row, you use the diagonal entry to zero-out all entries above that
+row in the same column.
+
+1 0 2/3 | 1/3     0 0
+0 1   1 |   0     0 1	row 2 - row 3   
+0 0   1 | 1/5 -3/10 0   
+
+1 0 2/3 |  1/3    0 0
+0 1   0 | -1/5  3/10 1  row 1 - 2/3 * row 3
+0 0   1 |  1/5 -3/10 0
+
+1 0 0 |  1/5   1/5 0
+0 1 0 | -1/5  3/10 1
+0 0 1 |  1/5 -3/10 0
+
+Therefore, the inverse is 
+
+[ 1/5   1/5 0 ]
+[-1/5  3/10 1 ]
+[ 1/5 -3/10 0 ]
+
+There are some implementation issues that you should be aware of when it
+comes to floating point operations.  These issues will be addressed in
+the description of the implementation of the inverse function later on.
+
+// ~ file format (input and output) ~ //
+
+In this assignment, you will use fread and fwrite extensively
+to access the files.  A matrix is stored in a file as follows:
+
+The first sizeof(int) bytes is an int, which specifies the size of the
+matrix.  Subsequently, you have size*size*sizeof(double) bytes.
+The first size*sizeof(double) bytes are the first row of entries,
+each a double, of the matrix.  The entries are from ordered from the
+first column till the last column.  The next size*sizeof(double) are
+the second row of entries, and so on.  
+
+No newlines or white space should be in the file.  Some sample matrices 
+axial thrustre given to you.  Some of these matrices are invertible and some are not.
+mat.100 is a 100-by-100 matrix, and nmat.100 is a non-invertible 100-by-100 
+matrix, for example.  zmat.100 is an invertible 100-by-100 matrix.
+
+The following is a 3x3 non-invertible matrix, and it is in nmat.3.
+
+ 1  5 -3 
+-4 -7  3 
+-3 -2  0
+
+An invertible 3x3 matrix is in mat.3.
+
+// ~ Functions to be written in pa_answer03.c ~ // 
+
+In pa_answer03.h, seven functions are declared, and among these
+seven functions, you have to implement the following six functions:
+
+double **Read_matrix_from_file(char *filename, int *size);  
+int Write_matrix_to_file(char *filename, double **matrix, int size); 
+double **Invert_matrix(double **matrix, int size); 
+double **Matrix_matrix_multiply(double **matrixa, double **matrixb, int size); 
+double Deviation_from_identity(double **matrix, int size); 
+void Deallocate_matrix_space(double **matrix, int size);
+
+The other function has already been implemented for you in pa_answer03.c.
+
+(2 points) 
+
+double **Read_matrix_from_file(char *filename, int *size);  
+
+This function reads a matrix from a given filename.  If the 
+matrix can be formed correctly, the matrix should be returned, and the number 
+of rows (or columns) of the matrix stored in (*size).
+
+(2 points) 
+int Write_matrix_to_file(char *filename, double **matrix, int size); 
+
+This function writes a matrix of a given size (number of rows 
+or column) to a given filename.  If the matrix can be stored properly, 1 
+should be returned.  Otherwise, 0 should be returned.
+
+(10 points) 
+
+double **Invert_matrix(double **matrix, int size); 
+
+This function inverts a matrix of a given size.  If the
+matrix is invertible, the inverse should be returned.  Otherwise, NULL should
+be returned.  You may use the elementary row operations to perform the
+Gauss-Jordan method.  If you want to use other methods to find the inverse,
+you may also do so.  Earlier, we alluded to some implementation issues
+when floating point operations are involved.
+
+If you are using the Gauss-Jordan method, be aware that because of the finite
+number of bits that we have in representing a real number, the true value
+in the multiplication/division/addition/subtraction of two real numbers may not
+be stored.  This loss of accuracy may result in a non-invertible matrix 
+becoming invertible and an invertible matrix becoming non-invertible.  When 
+we generate the matrices for testing, we know which matrices are invertible 
+and which are not.
+
+Because of the loss of accuracy, we have to assume that a very small number
+is actually a zero.  Therefore, whenever you come across a diagonal entry
+that has an absolute value less than TOL (= 1e-10, as defined in 
+pa_answer03.h), you assume that it is actually a zero.  The following 
+function, which is given in pa_answer03.c determine whether a real number 
+should be treated as zero:
+
+int Is_zero(double value)
+{
+   if (value < 0) {
+      value = -value;
+   }
+   if (value < TOL) {
+      return 1;
+   } else {
+      return 0;
+   }
+}
+
+You should use this function to determine whether a matrix is 
+invertible (see the Overview).  Note that the inversion function
+SHOULD BE the only function that calls Is_zero in this assignment. 
+
+The floating point operations can also cause numerical instability 
+issue, better known as the butterfly effect.  When you divide a number 
+with a really small number, the result is a big number.  Now imagine 
+that the dividend is the truncation/rounding error that occurs because
+of floating point representation, and the divisor is one of the
+diagonal entries you have chosen to zero-out a column of entries
+below the diagonal entry, you have amplified the error (the results of
+division).  Therefore, you should not use a small diagonal entry to
+zero-out a column of entries below it.
+
+The following approach may help to overcome the problem:
+
+1.   Suppose you are at row i in the downward pass of zeroing out the 
+lower triangular part of the matrix.  Instead of using a non-zero entry 
+at (i, i) to zero out all column-i entries below row i, you first find 
+the largest entry (magnitude wise) at column i (row i to the bottom-most row).
+Let this largest entry be at row i' (note that i' may be i).
+
+2.   If the largest entry (i', i) is "zero" (as determined by
+the Is_zero function), the matrix is deemed not invertible.  
+
+3.   Exchange row i' with row i if i != i'.  Proceed with zeroing out 
+all column-i entries below row i.
+
+(2 points)
+
+double **Matrix_matrix_multiply(double **matrixa, double **matrixb, int size); 
+
+This function performs multiplication of two matrices of the same 
+dimensions.  The result of matrixa * matrixb should be returned.
+Note that you should not use Is_zero in this function.
+
+(2 points)
+
+double Deviation_from_identity(double **matrix, int size); 
+
+This function calculates the difference of the given matrix from
+the identity matrix.  For each entry of the matrix, you calculate the
+absolute difference between the entry from the corresponding entry
+in the identity matrix.  Sum up all these absolute differences and return
+the value.  Note that you should not use Is_zero in this function.
+Note that is similar to the Matrix_matrix_difference function in PE08,
+except that one of the two matrices is always the identity matrix.   
+Therefore, the identity matrix does not have to be passed into the 
+function.
+
+(0 points)
+
+void Deallocate_matrix_space(double **matrix, int size);
+
+This function frees the space occupied by matrix.
+
+// ~ pa_answer03.h ~ //
+
+You may have to define other functions in pa_answer03.c.  If you plan to
+use these functions in pa03.c, you would have to declare these functions
+in pa_answer03.h.  Whether you make changes to pa_answer03.h or not, you
+have to include pa_answer03.h in the submission.  For the functions that
+you declare and define, do not start the function names with a prefix
+of two underscores "__".
+
+// ~ Function(s) to be written in pa03.c ~ // 
+
+(2 points) Your main function should expect an argument specifying one of 
+three options argv[1]:
+
+"-i": to perform inversion
+      argv[2] should be the input file containing the matrix to be inverted.
+      argv[3] should be the output file containing the inverted matrix if
+      the inversion is successful.
+      If the inversion is not successful, the output file should not be created
+      and you should return EXIT_FAILURE.
+
+"-m": to perform multiplication
+      argv[2] should be an input file containing matrixa, 
+      argv[3] should be an input file containing matrixb,
+      argv[4] should be the output file to store the result of multiplication.
+      If for whatever reasons the multiplication cannot be carried out, the
+      output file should not be created, and you should return EXIT_FAILURE.
+
+"-d": to compute the deviation from the identity matrix
+      argv[2] should be the input file containing the matrix,
+      the sum of differences of the entries should be printed to the stdout 
+      using, for example, 
+
+      printf("%e\n", Deviation_from_identity(matrix, size)); 
+
+      This is the only stdout output in this assignment, and you have to
+      use the format "%e\n".
+
+      If for whatever reasons the computation cannot be performed, 
+      the output should not be printed and you should return EXIT_FAILURE.
+
+others: print an error message to stderr and return EXIT_FAILURE.
+
+Whenever you encounter errors and you want to print an error message,
+use stderr for printing, not stdout.  In such a case, always return 
+EXIT_FAILURE.
+
+Return EXIT_SUCCESS only if it is a successful inversion, a succesful
+multiplication, or a successful computation of deviation.
+
+There may be many other functions that would be useful to your program.
+You may declare and define them in pa03.c
+
+// ~ How do you test your functions ~ //
+
+The main purpose of this assignment is to perform inversion.  The multiply
+function and deviation functions are actually functions that could be used
+to test your function.  Suppose I invert mat.100 and store the result in
+imat.100.  The multiplication of the matrices in mat.100 and imat.100 should
+produce an identity matrix.  Let's assume that I store the product in
+matimat.100.  Now, I check the deviation of the matrix in matimat.100 from
+the identity matrix.  
+
+If you are correct in your implementation, you should be able to invert
+an invertible matrix, and that when you take the difference between
+the identity matrix and the results of A * A^(-1), the difference should
+be very small (close to zero).
+
+In the example of mat.100, my implementation gives me a difference of
+
+1.078032e-11
+
+You should not compare your inverted matrix with the example included in
+this zip file because your implementation is likely different from mine
+and the problem of losing accuracy will affect your matrix differently.
+Rather, judge whether you have performed inversion properly by looking at
+the difference between I and A * A^(-1).
+ 
+// ~ Example files ~ //
+
+The suffix of a filename is the size of the matrix.  However, you should 
+rely on the first 4 bytes of the file to get the matrix size, not the file name.
+
+If the first letter of the filename is 'n', it is not invertible.
+
+If the first letter of the filename is 'i', it is the inverse of some matrix.  
+For example, imat.100 is the inverse of mat.100. izmat.100 is the inverse of 
+zmat.100.
+
+If the filename is a concatenation of the prefixes of two filenames, it is the
+multplication of the two matrices.  For example, matimat.100 is the 
+multiplication of mat.100 and imat.100.
+
+These files are in the folders invertible, noninvertible, inverses,
+and multiply.  I also included identity matrices in the folder 
+identity_matrix.  They are with the filename "iden".
+
+// ~ WARNINGS ~ //
+
+The following gcc command will be used for compilation:
+
+gcc -Wall -Werror -Wshadow -g pa03.c pa_answer03.c -o pa03
+
+If you code does not compile, you will get zero for this exercise.
+
+We will check for memory leakage.  Memory leakage will result in 
+a heavy penalty (50% deduction).
