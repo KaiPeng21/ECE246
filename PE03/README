@@ -1,0 +1,247 @@
+
+In this exercise, you will enhance a function that you have implemented in
+PE02:
+(i) To process a string and return a long int represented in the string
+(str_to_long_int).
+
+// ~ Learning Goals ~ //
+
+On top of the learning goals in PE02, the main learning goal of this
+exercise is:
+(1) How to set an error number when there is an overflow or underflow
+
+// ~ Getting Started ~ //
+
+The PE03 folder contains four files:
+(1) answer03.c: this is the file that you hand in. It has the skeleton
+of the functions in it, and you must "fill in the blanks".
+(2) answer03.h: this is a "header" file and it contains a description
+of the functions you will be writing for this exercise.
+(3) pa03.c: You should use this file to write testing code that
+runs the functions in answer03.c, in order to ensure their
+correctness. 
+(4) README: this file.
+
+For the most part, the description is similar to that of PE02.  The
+main difference is in the section on "Setting error number in str_to_long_int".
+
+To get started, browse through the answer03.h file, to see what code
+needs to be written. You will be writing code in the answer03.c
+file. Note that the function char_to_int is not in answer03.h and answer03.c.
+You will also write code in the pe03.c file to test code written in
+the answer03.c file.  pe03.c is meant for your
+testing of answer03.c.  It should not be submitted.
+
+Follow the discussions below on how to compile and run your code, as
+well as test and submit it.
+
+// ~ Submitting Your Exercise ~ //
+
+You submit only one file:
+(1) answer03.c (12 points)
+
+You submit the file using the following command:
+
+> 264submit PE03 answer03.c
+
+// ~ (1a) Compiling Your Program ~ //
+
+To compile your program, use the following command:
+
+> gcc -Wall -Wshadow -Werror -g pe03.c answer03.c -o pe03
+
+Note that you are not allowed to use any functions from the
+math library.  In other words, do not use functions from
+math.h or its equivalent in this exercise.  We will use
+the above command for compiling your code.   (We will have
+our own pe03.c to test your functions in answer03.c.)
+
+// ~ (1b) Running Your Program ~ //
+
+To run your program, it depends on what you put in pe03.c.
+I leave it to you how you want to write your test functions
+and what input arguments your main function is expecting.
+Therefore, I can't tell you what exactly you should type into the
+terminal.  It would look like this:
+
+> ./pe03 "your input arguments"
+
+Note that this should print:
+
+Welcome to ECE264, we are working on PE03.
+
+I don't know what to expect beyond that.
+
+// ~ (1c) Testing Your Program ~ //
+(This is almost similar to PE02 README) 
+
+It is your responsibility to test the functions implemented in
+answer03.c and ensure that they work.   How should you test your
+implementation?
+
+C has a function that would do exactly what you have been asked
+to do in this exercise for the str_to_long_int function.  You have seen this 
+function in the lecture notes, and that function is strtol.  However, you 
+are not allowed to call this function in your function, as I do not allow 
+you to include stdlib.h in answer03.c.  If that function shows up
+in answer03.c, even if it is commented, you will receive ZERO for
+this exercise.
+
+// ~ (2) Running your program in Valgrind ~ //
+(This is identical to PE02 README) 
+
+I am not asking you to submit a log this time.  However, it is
+always a good practice to check for abnormal behavior of your
+program in Valgrind.
+
+// ~ (3) Working with strings ~ //
+(This is identical to PE02 README) 
+
+For this exercise, we assume that the input address
+supplied to the str_to_long_int function are not NULL (a compilation 
+error will occur if it is NULL).  
+
+A legal string as a number should be of the following form:
+
+"possibly some white space" "optional +/- sign" "combination of 0..9, a..z, A..Z"
+
+White space can be space (' '), horizontal tab ('\t'), 
+carriage return ('\r'), form-feed ('\f'), newline ('\n') and 
+vertical tab ('\v'). 
+
+Here 'a'..'z', 'A'..'Z' are considered legal because we allow up to
+a base of 36.  We will consider a base from 2 through 36.  We can't have a 
+base of 1, because the only valid symbol will be '0', which is quite 
+meaningless.  For a base from 2 through 10, the valid symbols are '0' 
+through (base - 1).  We also include the letters 'a' through 'z' 
+when we consider a base from 11 through 36.  'a' stands for 10 
+(in base 10), 'b' for 11, ..., 'z' for 35.  Note that your functions 
+should accept both upper case and lower case letters.
+
+To check whether you have reached the end of a string, you
+have to check whether you have '\0' character at that location.
+
+There are a few functions that could be useful for you from 
+ctype.h.  I list a few below:
+(1) isspace : checks for a white-space character
+(2) isdigit : check for a digit (0 through 9)
+(3) isupper : check for an uppercase letter
+(4) islower : check for a lower-case letter
+(5) isxdigit : check for a hexadecimal digit 0-9, a-f, A-F
+
+As there could be leading white space characters in the given string,
+you have to skip over characters that are considered to 
+be white space before the conversion.
+
+The number represented in the string may start with a negative sign 
+'-' or a positive sign '+'.  
+
+Immediately following the optional +/- sign should be the legal
+symbols for a particular base.
+
+// ~ (3) Converting a string into a number ~ //
+(This is identical to PE02 README) 
+
+Your conversion should stop whenever you encounter an invalid symbol for
+that base.   For example, for the following string "     +243adg",
+the following sub-strings should be converted for the respective bases:
+(1) for base 2, "     +", because '2' is not a valid symbol,
+(2) for base 4, "     +2", because '4' is not a valid symbol,
+(3) for base 11, "     +243a", because 'd' is the first invalid symbol.
+
+For case (1), you should return 0, for (2), 2, and for case (3), 2*11*11*11
++ 4*11*11 + 3*11 + 10 = 3189.
+
+(Interesting fact:  If you try to convert "0x10" using strtol for base 16,
+you will get 16.   However, the str_to_long_int function should return 0.  
+To find out more, please do a "man strtol".)
+
+Given a string of valid symbols, how should we convert the string to a number?
+Let's assume that the number will be stored in the variable ret_value, 
+and you will return that value.
+
+First, initialize the ret_value to 0.
+Let's assume that are converting "243a" for base 11, we encounter '2' first. 
+First, you have to convert a character '2' to a number 2.  We will update 
+ret_value to ret_value * base + 2, which gives us 2.
+When we encounter the next symbol '4', we convert '4' to a number 4, and
+update ret_value to ret_value * base + 4, which gives us 26.
+Next, convert '3' to number 3, update ret_value to 26 * base + 3 = 289.
+Last, convert 'a' to number 10, and update ret_value to 289 * base + 10 = 3189.
+
+The above steps assume that the sign is positive.  You have to make minor
+changes to the steps when the sign is negative.
+
+Seeing that you are repeating the steps of converting a character to
+a number, and updating the ret_value using the same equation, you should
+write these steps as an iteration (while-loop, for-loop, for example).
+When should the iteration stop?  Perhaps when you encounter '\0' or 
+when you encounter an invalid symbol for that base.
+
+// ~ Setting error number in str_to_long_int ~//
+(This is the main difference between PE02 and PE03)
+
+The variable 'errno' is defined in errno.h.
+
+If the base is invalid, the variable 'errno' should be set to
+EINVAL (invalid argument) before you return from the str_to_long_int 
+function.  
+
+If the number to be converted is larger than LONG_MAX or smaller
+than LONG_MIN, the variable 'errno' should be set to 
+ERANGE before you return from the function.  
+LONG_MAX and LONG_MIN are the largest and smallest long int, 
+and they are defined in limits.h.  The returned value
+number should be LONG_MAX or LONG_MIN, accordingly.
+
+To determine whether you have a number greater than LONG_MAX 
+you have to check whether a multiplication or an addition
+can result in an overflow.  Consider two long int variables a and b,
+both of which are non-negative (when you are converting a string into a 
+positive number, both long int variables involved are non-negative).
+If a + b > LONG_MAX, you get an overflow.  However, you cannot check for
+the condition (a+b) > LONG_MAX because when that condition holds, overflow
+has already occurred, and the result of (a+b) will give you a number
+smaller than LONG_MAX.  You should also write simple code to find out what 
+happens when you add a positive number to LONG_MAX to understand the
+challenge here.  
+
+Therefore, to check for the condition that (a+b) > LONG_MAX, we typically
+do "if (LONG_MAX - b) < a" or "if (LONG_MAX - a) < b".
+
+How about the multiplication of a and b? You can use a similar idea.
+Overflow occurs when a * b > LONG_MAX.  Therefore, you want to check
+whether LONG_MAX / a < b or LONG_MAX / b < a.  Here, we are dealing with
+integer division.  However, you want to be careful about division by 0, which 
+is undefined.  Overflow may occur only if both a and b are not 0.
+
+You want to work on when underflow can occur, i.e., a + b < LONG_MIN
+and a * b < LONG_MIN when converting a string to a negative number.
+
+In pe03.c, we set errno to 0 before calling the str_to_long_int function.
+After that, we print the errno to check for the status of the conversion.
+
+// ~ Grading ~ //
+
+The 12 points are distributed as follows:
+(i) The setting of errno: 3 points.
+(ii) Ability to convert properly, i.e., correctness of returned value: 
+     8 points. (emphasis on overflow or underflow)
+(iii) No change to the input string: 1 point.
+
+// ~ Summary ~ //
+
+
+# Compile 
+> gcc -Wall -Wshadow -Werror -g pe03.c answer03.c -o pe03
+
+# Run -- you must write your own tests
+> ./pe03 "your input arguments"
+
+# Run under valgrind (also depends on whether you have input arguments)
+> valgrind --tool=memcheck --leak-check=yes --log-file=memcheck.log ./pe03 "your input arguments"
+
+# Don't forget to *LOOK* at the log-file "memcheck.log"
+
+# Submit your solution:
+> 264submit PE03 answer03.c
