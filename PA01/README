@@ -1,0 +1,156 @@
+
+In this programming assignment (this is NOT an exercise), you will implement 
+one function:
+(i) my_strtol, a function that is similar to the function strtol in
+C standard library.
+
+// ~ Learning Goals ~ //
+
+The main learning goals:
+(1) How to "iterate" over a string, or an array of characters 
+terminated with '\0'.
+(2) How to convert a string into a number in different bases.
+(3) How to set an error number when the base is invalid, or when
+there is an overflow or underflow.
+(4) How to patiently read through a manual page (for strtol, in this case)
+and design test cases to thoroughly understand a function (strtol, in this case)
+(5) How to test your own implementation.
+
+// ~ Getting Started ~ //
+
+The PA01 folder contains four files:
+(1) pa_answer01.c: this is the file that you hand in. 
+(2) pa_answer02.h: this is a "header" file and it contains a declaration
+of the my_strtol function.
+(3) pa01.c: You should use this file to write testing code that
+runs the functions in pa_answer01.c, in order to ensure their correctness.   
+(4) README: this file.
+
+To get started, browse through all four files to see what code
+needs to be written.  It is most important that you read the manual
+page of strtol.  You can use the command 
+
+> man strtol 
+
+to access the manual page on a linux machine.  You can also use "man strtol"
+as the search string on an internet browser to access the manual page.
+Your understanding of the strtol function is crucial to your successful
+implementation of my_strtol in this programming assignment.
+
+You will be writing code in the pa_answer01.c file. You will also write 
+code in the pa01.c file to test the function or functions (you may
+write additional functions to be called by my_strtol) written in the 
+my_answer01.c file.  However, the only file to be submitted is my_answer01.c.
+
+Follow the discussions below on how to compile and run your code, as
+well as test and submit it.
+
+// ~ Submitting Your Exercise ~ //
+
+You submit only one file:
+(1) pa_answer01.c (20 points)
+
+You submit the file using the following command.
+ 
+> 264submit PA01 pa_answer01.c
+
+// ~ (1a) Compiling Your Program ~ //
+
+To compile your program, use the following command:
+
+> gcc -Wall -Wshadow -Werror -g pe01.c pa_answer01.c -o pa01
+
+You are not allowed to use any functions from the math library
+as we will not use the option "-lm" in the gcc command.
+
+// ~ (1b) Running Your Program ~ //
+
+By now, you should know how to run your program.
+
+// ~ (1c) Testing Your Program ~ //
+
+It is your responsibility to test the function implemented in
+pa_answer01.c and ensure that it works in a similar way as 
+strtol, in terms of the returned value of the function, the
+update of the contents at the location whose address is stored
+in the second argument of the function (if the second argument is
+not a null address), and the errno.
+
+How should you test your implementation?  You have to understand
+the strtol function, which is a black box to you.  However, the
+manual page, and by trying out strtol function with different input
+string should allow you to understand the strtol function well
+enough to complete this assignment successfully.
+
+Note that you are not allowed to call this function in your function, 
+as I do not allow you to include stdlib.h in pa_answer01.c.  If that 
+function shows up in pa_answer01.c, even if it is commented, you will 
+receive ZERO for this assignment.
+
+However, you are allowed to use strtol in your test functions in
+pa01.c to verify that your function works correctly.
+
+// ~ (2) Running your program in Valgrind ~ //
+
+I am not asking you to submit a log this time.  However, it is
+always a good practice to check for abnormal behavior of your
+program in Valgrind.
+
+// ~ (3) Working with strings ~ //
+
+You have some experience with strings from PE02 and PE03.  In a 
+sense, this assignment is an extension of PE02 and PE03.  You should
+read the README of PE02 and PE03 again.
+
+// ~ (3) Converting a string into a number ~ //
+
+This is covered in the README of PE02 and PE03, too.  The main differences
+in str_to_long_int and my_strtol are:
+(1) base 0 is a valid base for my_strtol, because base 0 can either
+be base 10, base 8 (octal), or base 16 (hexadecimal).  It depends
+on the first or the first two characters of the input string after the 
+optional +/- sign.
+(2) base 16 of my_strtol also accepts an input that is prefixed with 
+"0x" or "0X".
+(3) You have to save the location (of the input string) at which 
+the conversion fails.  The address of that location has to be saved in
+the location pointed to by the second argument of my_strtol.   It is
+important that you tried strtol for different input strings and bases
+to figure out what should be stored there.
+
+The details can be found in the manual page of strtol.
+
+// ~ Setting error number in my_strtol ~//
+
+The variable errno should be set to EINVAL if the base is invalid.
+It should be set to ERANGE is the input string exceed the range.
+
+// ~ Grading ~ //
+
+The 20 points are distributed as follows:
+(i) The setting of errno: 2 points.
+(ii) Ability to convert properly:
+     (a) For bases 2 to 15, 17 to 36: 3 points.
+     (b) For base 0: 6 points 
+     (c) For base 16: 4 points
+(iii) No change to the input string: 1 point.
+(iv) The address (or the location) of the input string at which the conversion 
+stops.  This address is stored at the location pointed to by the second
+argument to the my_strtol function: 4 points
+
+// ~ Summary ~ //
+
+
+# Compile 
+> gcc -Wall -Wshadow -Werror -g pa01.c pa_answer01.c -o pa01
+
+# Run -- you must write your own tests
+> ./pa01 "your input arguments"
+
+# Run under valgrind (also depends on whether you have input arguments)
+> valgrind --tool=memcheck --leak-check=yes --log-file=memcheck.log ./pa01
+
+# Don't forget to *LOOK* at the log-file "memcheck.log"
+
+# Submit your file:
+> 264submit PA01 pa_answer01.c 
